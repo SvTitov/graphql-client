@@ -16,7 +16,7 @@ namespace GraphQL_Console
     {
         static void Main(string[] args)
         {
-            var baseUlr = @"http://graphql.org/swapi-graphql/";
+            var baseUlr = @"https://graphql-pokemon.now.sh";
 
             //HttpClient client = new HttpClient();
             //var paramsDictionary = new Dictionary<string, string>
@@ -31,16 +31,6 @@ namespace GraphQL_Console
             //var result = client.PostAsync(baseUlr, content).Result;
 
             //var str = result.Content.ReadAsStringAsync().Result;
-
-
-            //var cl = new QlClinet(baseUlr);
-
-            //Task.Run(async () =>
-            //{
-            //    var rr =  await cl.ExecuteQuery<FooClass>("{pokemon(name: \"Pikachu\") { id }}");
-            //}).Wait();
-
-
 
             // -------------
 
@@ -57,19 +47,27 @@ namespace GraphQL_Console
                                                  () => new QLField("height"));
 
             var query = new QueryBuilder()
-                                .CreateQuery()
-                                .AddFragment(() => fragment)
+                                .CreateQuery("SomeQuery ($name: String)")
                                 .AddFields
                                 (
-                                    () => new QLField("allPeople", ("first", "2"))
-                                                .AddFields(()=> new QLField("people")
-                                                   .AddFields(()=> fragment,
-                                                              ()=> new QLField("birthYear")))
+                                    () => new QLField("pokemon", ("name", "$name"))
+                                                .AddFields(()=> new QLField("id"),
+                                                           ()=> new QLField("attacks")
+                                                                        .AddFields(()=> new QLField("special")
+                                                                                                .AddFields(()=> new QLField("name"),
+                                                                                                           ()=> new QLField("type"),
+                                                                                                           ()=> new QLField("damage"))))
                                 );
 
             var queryString = query.ToString();
 
-            string testFragment = fragment.ToString();
+            var cl = new QlClinet(baseUlr);
+
+            Task.Run(async () =>
+            {
+                var rr =  await cl.ExecuteQuery<dynamic>(query.ToString());
+            }
+            ).Wait();
         }
     }
 

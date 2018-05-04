@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using GraphQLClient.Interfaces;
+using System.Linq;
 
 namespace GraphQLClient.Implementations
 {
@@ -9,7 +10,7 @@ namespace GraphQLClient.Implementations
     {
         private readonly List<IField> _fields = new List<IField>();
         private readonly List<IFragment> _fragments = new List<IFragment>();
-
+        private readonly List<string> _variables = new List<string>();
         private string _name;
 
         public QLQuery()
@@ -42,6 +43,21 @@ namespace GraphQLClient.Implementations
             return this;
         }
 
+        public IQuery AddVariables(params string[] variables)
+        {
+            _variables.AddRange(variables);
+
+            return this;
+        }
+
+        public string GetVariables()
+        {
+            StringBuilder builder = new StringBuilder();
+            AddVariablesText(builder);
+
+            return builder.ToString();
+        }
+
         public override string ToString()
 		{
             StringBuilder builder = new StringBuilder();
@@ -60,7 +76,11 @@ namespace GraphQLClient.Implementations
                 }
                 builder.Append('}');
             }
-            AddFragmentText(builder);
+
+            if (_fragments.Count > 0)
+                AddFragmentText(builder);
+            if (_variables.Count > 0)
+                AddVariablesText(builder);
 
             return builder.ToString();
 		}
@@ -69,6 +89,13 @@ namespace GraphQLClient.Implementations
         {
             foreach (var item in _fragments)
                 builder.Append(item.ToString());
+        }
+
+        private void AddVariablesText(StringBuilder builder)
+        {
+            builder.Append("{");
+            _variables.ForEach((obj) => builder.AppendFormat(" {0}" ,obj));
+            builder.Append("}");
         }
 	}
 }

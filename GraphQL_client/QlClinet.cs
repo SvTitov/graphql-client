@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using GraphQLClient.Interfaces;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -24,12 +25,11 @@ namespace GraphQLClient
             return JsonConvert.DeserializeObject<T>(data);
         }
 
-
-        public async Task<dynamic> ExecuteQuery(string query, string param = null)
+        public async Task<T> ExecuteQuery<T>(IQuery query)
         {
-            var data = await InternalExecute(query, param);
+            var data = await InternalExecute(query.ToString(), query.GetVariables());
 
-            return JsonConvert.DeserializeObject<dynamic>(data);
+            return JsonConvert.DeserializeObject<T>(data);
         }
 
         private async Task<string> InternalExecute(string query, string param)
