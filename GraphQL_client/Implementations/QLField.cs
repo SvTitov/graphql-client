@@ -10,7 +10,7 @@ namespace GraphQLClient.Implementations
         private string _name;
         private string _alias;
         private readonly Dictionary<string, string> _args = new Dictionary<string, string>();
-        private readonly List<IField> _fields = new List<IField>();
+        private readonly List<IQueryField> _fields = new List<IQueryField>();
 
 
         public QLField(string name)
@@ -27,7 +27,7 @@ namespace GraphQLClient.Implementations
             }
         }
 
-        public IField AddFields(params Func<IField>[] p)
+        public IField AddFields(params Func<IQueryField>[] p)
         {
             foreach (var item in p)
             {
@@ -61,7 +61,12 @@ namespace GraphQLClient.Implementations
                 builder.Append('{');
 
                 foreach (var field in _fields)
-                    builder.Append(field.ToString());
+                {
+                    if (field is IFragment fr)
+                        builder.AppendFormat("...{0}", fr.Name);
+                    else
+                        builder.Append(field.ToString());
+                }
                 builder.Append('}');
             }
 

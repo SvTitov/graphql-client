@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GraphQLClient;
 using GraphQLClient.Implementations;
+using GraphQLClient.Interfaces;
 using Newtonsoft.Json;
 
 namespace GraphQL_Console
@@ -51,18 +52,24 @@ namespace GraphQL_Console
             //() => new QLField(),
             //() => new QLField());
 
+            IFragment fragment = new QLFragment("somepeople", "Person")
+                                      .AddFields(() => new QLField("name"),
+                                                 () => new QLField("height"));
+
             var query = new QueryBuilder()
                                 .CreateQuery()
+                                .AddFragment(() => fragment)
                                 .AddFields
                                 (
                                     () => new QLField("allPeople", ("first", "2"))
-                                        .AddFields(()=> new QLField("people")
-                                                   .AddFields(()=> new QLField("name"),
-                                                              ()=> new QLField("gender")))
-                                                
+                                                .AddFields(()=> new QLField("people")
+                                                   .AddFields(()=> fragment,
+                                                              ()=> new QLField("birthYear")))
                                 );
 
             var queryString = query.ToString();
+
+            string testFragment = fragment.ToString();
         }
     }
 

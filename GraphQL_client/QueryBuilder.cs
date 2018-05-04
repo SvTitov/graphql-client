@@ -1,4 +1,5 @@
 ﻿using System;
+using GraphQLClient.Implementations;
 using GraphQLClient.Interfaces;
 
 namespace GraphQLClient

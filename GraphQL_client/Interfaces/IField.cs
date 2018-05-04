@@ -1,9 +1,9 @@
 ﻿using System;
 namespace GraphQLClient.Interfaces
 {
-    public interface IField
+    public interface IField : IQueryField
     {
-        IField AddFields(params Func<IField>[] p);
+        IField AddFields(params Func<IQueryField>[] p);
 
         IField WithAlias(string alias);
     }

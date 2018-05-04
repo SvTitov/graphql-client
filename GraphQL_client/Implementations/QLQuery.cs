@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Text;
 using GraphQLClient.Interfaces;
 
-namespace GraphQLClient
+namespace GraphQLClient.Implementations
 {
     public class QLQuery : IQuery
     {
         private readonly List<IField> _fields = new List<IField>();
+        private readonly List<IFragment> _fragments = new List<IFragment>();
+
         private string _name;
 
         public QLQuery()
@@ -29,7 +31,18 @@ namespace GraphQLClient
             return this;
         }
 
-		public override string ToString()
+		public IQuery AddFragment(params Func<IFragment>[] fr)
+        {
+            foreach (var fragment in fr)
+            {
+                var gragmnt = fragment.Invoke();
+                _fragments.Add(gragmnt);
+            }
+
+            return this;
+        }
+
+        public override string ToString()
 		{
             StringBuilder builder = new StringBuilder();
 
@@ -47,9 +60,15 @@ namespace GraphQLClient
                 }
                 builder.Append('}');
             }
-
+            AddFragmentText(builder);
 
             return builder.ToString();
 		}
+
+        private void AddFragmentText(StringBuilder builder)
+        {
+            foreach (var item in _fragments)
+                builder.Append(item.ToString());
+        }
 	}
 }
