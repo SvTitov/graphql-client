@@ -18,23 +18,6 @@ namespace GraphQL_Console
         {
             var baseUlr = @"https://graphql-pokemon.now.sh";
 
-            //HttpClient client = new HttpClient();
-            //var paramsDictionary = new Dictionary<string, string>
-            //{
-            //    {"query", "query Opa($name: String) {somedd: pokemon(name: $name) {id}}"},
-            //    {"variables", "{\"name\":\"Pikachu\"}"},
-            //    //{"operationName", "Opa"}
-            //};
-
-            //var content = new FormUrlEncodedContent(paramsDictionary);
-
-            //var result = client.PostAsync(baseUlr, content).Result;
-
-            //var str = result.Content.ReadAsStringAsync().Result;
-
-            // -------------
-
-
             //new QueryBuilder().CreateQuery("blah-blah").AddFields
             //(() => new QLField(("lol","kek"))
             //                 .WithAlias("opa")
@@ -57,9 +40,10 @@ namespace GraphQL_Console
                                                                                                 .AddFields(()=> new QLField("name"),
                                                                                                            ()=> new QLField("type"),
                                                                                                            ()=> new QLField("damage"))))
-                                );
+                                ).AddVariables(("name","value"));
 
             var queryString = query.ToString();
+			var varStr = query.GetVariables();
 
             var cl = new QlClinet(baseUlr);
 

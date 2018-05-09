@@ -10,7 +10,7 @@ namespace GraphQLClient.Implementations
     {
         private readonly List<IField> _fields = new List<IField>();
         private readonly List<IFragment> _fragments = new List<IFragment>();
-        private readonly List<string> _variables = new List<string>();
+		private readonly List<(string, string)> _variables = new List<(string, string)>();
         private string _name;
 
         public QLQuery()
@@ -43,7 +43,7 @@ namespace GraphQLClient.Implementations
             return this;
         }
 
-        public IQuery AddVariables(params string[] variables)
+        public IQuery AddVariables(params (string, string)[] variables)
         {
             _variables.AddRange(variables);
 
@@ -79,8 +79,6 @@ namespace GraphQLClient.Implementations
 
             if (_fragments.Count > 0)
                 AddFragmentText(builder);
-            if (_variables.Count > 0)
-                AddVariablesText(builder);
 
             return builder.ToString();
 		}
@@ -94,7 +92,9 @@ namespace GraphQLClient.Implementations
         private void AddVariablesText(StringBuilder builder)
         {
             builder.Append("{");
-            _variables.ForEach((obj) => builder.AppendFormat(" {0}" ,obj));
+			_variables.ForEach((obj) => builder.AppendFormat(" \"{0}\": {1}," ,obj.Item1, obj.Item2));
+            //remove last ","
+			builder.Length--;
             builder.Append("}");
         }
 	}
