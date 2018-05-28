@@ -7,7 +7,7 @@ namespace GraphQLClient.Interfaces
 
         IQuery AddFragment(params Func<IFragment>[] fr);
 
-        IQuery AddVariables(params (string, string)[] variables);
+		IQuery AddVariables(params QLVariable[] variables);
 
         string GetVariables();
     }

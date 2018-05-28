@@ -11,6 +11,7 @@ namespace GraphQLClient.Implementations
         private string _alias;
         private readonly Dictionary<string, string> _args = new Dictionary<string, string>();
         private readonly List<IQueryField> _fields = new List<IQueryField>();
+		private readonly List<(string, string, string)> _directives = new List<(string, string, string)>();
 
 
         public QLField(string name)
@@ -54,7 +55,7 @@ namespace GraphQLClient.Implementations
             if (!string.IsNullOrEmpty(_alias))
                 builder.Append($"{_alias}:");
 
-            builder.Append($" {_name} {(isHaveArgs ? ("(" + args + ")") : string.Empty)}");
+			builder.Append($" {_name} {(isHaveArgs ? ("(" + args + ")") : string.Empty)} {(_directives.Count > 0 ? RenderDirectiveText() : string.Empty)}");
 
             if (_fields.Count > 0)
             {
@@ -83,5 +84,27 @@ namespace GraphQLClient.Implementations
 
             return builder.ToString();
         }
+
+		public IField AddDirectives(string name, string condition = null, string value = null)
+		{
+			_directives.Add((name, condition, value));
+
+			return this;
+		}
+
+        private string RenderDirectiveText()
+		{
+			StringBuilder builder = new StringBuilder();
+
+
+			_directives.ForEach(dir =>
+			{
+				builder.Append($"@{dir.Item1}");
+				if (!string.IsNullOrEmpty(dir.Item2) && !string.IsNullOrEmpty(dir.Item3))
+					builder.Append($"({dir.Item2}: {dir.Item3})");
+			});
+
+			return builder.ToString();
+		}
 	}
 }

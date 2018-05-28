@@ -6,5 +6,7 @@ namespace GraphQLClient.Interfaces
         IField AddFields(params Func<IQueryField>[] p);
 
         IField WithAlias(string alias);
+
+		IField AddDirectives(string name, string condition = null, string value = null);
     }
 }

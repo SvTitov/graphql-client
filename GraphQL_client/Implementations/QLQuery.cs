@@ -10,7 +10,7 @@ namespace GraphQLClient.Implementations
     {
         private readonly List<IField> _fields = new List<IField>();
         private readonly List<IFragment> _fragments = new List<IFragment>();
-		private readonly List<(string, string)> _variables = new List<(string, string)>();
+		private readonly List<QLVariable> _variables = new List<QLVariable>();
         private string _name;
 
         public QLQuery()
@@ -43,7 +43,7 @@ namespace GraphQLClient.Implementations
             return this;
         }
 
-        public IQuery AddVariables(params (string, string)[] variables)
+        public IQuery AddVariables(params QLVariable[] variables)
         {
             _variables.AddRange(variables);
 
@@ -66,7 +66,11 @@ namespace GraphQLClient.Implementations
             if (!string.IsNullOrEmpty(_name))
                 builder.AppendFormat("query {0}", _name);
 
-            if (_fields.Count > 0)
+			// add text variable like ($episode: Episode)
+			if (_variables.Count > 0)
+				builder.Append(GetVariablesText());
+
+			if (_fields.Count > 0)
             {
                 builder.Append('{');
                 for (int i = 0; i < _fields.Count; i++)
@@ -89,10 +93,27 @@ namespace GraphQLClient.Implementations
                 builder.Append(item.ToString());
         }
 
-        private void AddVariablesText(StringBuilder builder)
+		private string GetVariablesText()
+		{
+			StringBuilder builder = new StringBuilder();
+
+			builder.Append("(");
+			_variables.ForEach(variable =>
+			{
+				builder.AppendFormat("${0}: {1} ", variable.Name, variable.Type);
+				if (!string.IsNullOrEmpty(variable.DefaultValue))
+					builder.Append($"= {variable.DefaultValue} ");
+			});
+			builder.Append("}");
+
+			return builder.ToString();
+		}
+
+		private void AddVariablesText(StringBuilder builder)
         {
             builder.Append("{");
-			_variables.ForEach((obj) => builder.AppendFormat(" \"{0}\": {1}," ,obj.Item1, obj.Item2));
+			_variables.ForEach((obj) => builder.AppendFormat(" \"{0}\": {1}," ,obj.Name, string.IsNullOrEmpty(obj.Value) 
+			                                                 ? obj.DefaultValue : obj.Value ));
             //remove last ","
 			builder.Length--;
             builder.Append("}");

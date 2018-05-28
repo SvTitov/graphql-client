@@ -30,17 +30,18 @@ namespace GraphQL_Console
                                                  () => new QLField("height"));
 
             var query = new QueryBuilder()
-                                .CreateQuery("SomeQuery ($name: String)")
+                                .CreateQuery("SomeQuery")
                                 .AddFields
                                 (
                                     () => new QLField("pokemon", ("name", "$name"))
                                                 .AddFields(()=> new QLField("id"),
                                                            ()=> new QLField("attacks")
                                                                         .AddFields(()=> new QLField("special")
+				                                                                                .AddDirectives("include", "if", "false")
                                                                                                 .AddFields(()=> new QLField("name"),
                                                                                                            ()=> new QLField("type"),
                                                                                                            ()=> new QLField("damage"))))
-                                ).AddVariables(("name","value"));
+                                ).AddVariables(new QLVariable{Name = "name", Type = "String", Value= "\"Pikachu\""});
 
             var queryString = query.ToString();
 			var varStr = query.GetVariables();

@@ -10,5 +10,10 @@ namespace GraphQLClient
         {
             return new QLQuery(name);
         }
+
+		public IMutation CreateMutation(string name)
+		{
+			return new QLMutation();
+		}
     }
 }
